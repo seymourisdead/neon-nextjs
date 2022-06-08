@@ -1,17 +1,20 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
-import postgres from "postgres";
+import { Client } from "pg";
 
 export default async function handler(req, res) {
-  const sql = postgres({
-    host                 : process.env.NEON_HOST,
-    port                 : process.env.NEON_PORT,
-    database             : process.env.NEON_DB,
-    username             : process.env.NEON_USER,
-    password             : process.env.NEON_PASS,
-  });
+  const client = new Client({
+    connectionString: `${process.env.PG_CONNSTRING}?sslmode=requre`
+  })
 
-  const result = await sql.unsafe(req.body);
+  try {
+    await client.connect();
+  } catch(e) {
+    res.status(400);
+  }
+
+  const result = await client.query(req.body);
+  await client.end()
 
   res.status(200).json(result);
 }

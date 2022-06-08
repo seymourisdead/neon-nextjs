@@ -25,6 +25,7 @@ const NeonPlayground = () => {
         theme={"github"}
         ref={editorRef}
         height={'200px'}
+        defaultValue={"select 1;"}
       />
       <br />
       <button
