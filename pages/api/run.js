@@ -3,8 +3,15 @@
 import { Client } from "pg";
 
 export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    res.status(405).send({ message: 'Only POST requests allowed' })
+    return;
+  } 
+
+  const { connectionString, query } = JSON.parse(req.body);
+
   const client = new Client({
-    connectionString: `${process.env.PG_CONNSTRING}?sslmode=requre`
+    connectionString: `${connectionString}?sslmode=requre`
   })
 
   try {
@@ -13,8 +20,8 @@ export default async function handler(req, res) {
     res.status(400);
   }
 
-  const result = await client.query(req.body);
+  const result = await client.query(query);
   await client.end()
 
-  res.status(200).json(result);
+  return res.status(200).json(result);
 }
